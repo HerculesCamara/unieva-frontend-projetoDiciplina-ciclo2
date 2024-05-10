@@ -8,10 +8,90 @@
 <body>
     <main>
         Faça o login 😊
-        <button>
+        <button onclick="loginTwitter()">
             Logar com Twitter/X
             <svg viewBox="0 0 24 24" aria-hidden="true" class="r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-lrsllp r-1nao33i r-16y2uox r-8kz0gk"><g><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg>
         </button>
     </main>
+
+    <script>
+        async function loginWithTwitter() {
+          const requestTokenUrl = 'https://api.twitter.com/oauth/request_token';
+          const callbackUrl = 'https://unieva-frontend-projeto-diciplina-ciclo2.vercel.app/';
+    
+          const oauth = {
+            consumer_key: '708682881439240196-CEaP2uIdtd1jtLCj5TSLgoXySXrWlLM',
+            consumer_secret: 'mhPBjOMRGU19DNdNqsZvUgtvLP19J1GZ7ngDqDsxWHqs1',
+            callback: callbackUrl
+          };
+    
+          const response = await fetch(requestTokenUrl, {
+            method: 'POST',
+            headers: {
+              'Authorization': 'OAuth oauth_callback="' + encodeURIComponent(oauth.callback) + '"',
+            }
+          });
+    
+          if (response.ok) {
+            const data = await response.text();
+            
+            const requestToken = getRequestToken(data);
+            
+            localStorage.setItem('requestToken', requestToken);
+            
+            window.location.href = 'https://api.twitter.com/oauth/authenticate?oauth_token=' + requestToken;
+          } else {
+            console.error('Falha ao obter token de solicitação');
+          }
+        }
+    
+        
+        function getRequestToken(response) {
+          const match = response.match(/oauth_token=([^&]+)/);
+          if (match && match[1]) {
+            return match[1];
+          } else {
+            throw new Error('Token de solicitação não encontrado na resposta');
+          }
+        }
+    
+        
+        function getAccessTokenFromUrl() {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.get('oauth_token');
+        }
+    
+        
+        window.onload = function() {
+          const oauthToken = getAccessTokenFromUrl();
+          if (oauthToken) {
+            const requestToken = localStorage.getItem('requestToken');
+            const accessTokenUrl = `https://api.twitter.com/oauth/access_token?oauth_token=${requestToken}&oauth_verifier=${oauthToken}`;
+            fetch(accessTokenUrl)
+              .then(response => response.text())
+              .then(data => {
+                
+                const accessToken = getAccessToken(data);
+                
+                localStorage.setItem('accessToken', accessToken);
+                
+                window.location.href = '/profile';
+              })
+              .catch(error => {
+                console.error('Falha ao obter token de acesso:', error);
+              });
+          }
+        }
+    
+        
+        function getAccessToken(response) {
+          const match = response.match(/oauth_token=([^&]+)&oauth_token_secret=([^&]+)/);
+          if (match && match[1] && match[2]) {
+            return { token: match[1], secret: match[2] };
+          } else {
+            throw new Error('Tokens de acesso não encontrados na resposta');
+          }
+        }
+      </script>
 </body>
 </html>
