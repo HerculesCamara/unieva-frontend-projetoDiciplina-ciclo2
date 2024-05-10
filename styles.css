@@ -17,7 +17,7 @@ body a {
   header {
     color: #fff;
     padding: 30px 50px;
-    position: fixed;
+    position: sticky;
     top: 0;
     width: 100%;
 
@@ -79,9 +79,12 @@ body a {
     color: #fff;
     padding: 10px;
     text-align: center;
-    position: fixed;
     bottom: 0;
     width: 100%;
+  }
+  footer a {
+    text-decoration: none;
+    color: rgb(1, 185, 124);
   }
 
   .banner {
@@ -94,7 +97,6 @@ body a {
 
     max-width: 1300px;
     margin: auto;
-    margin-top: 103px;
   }
 
   .banner img {
