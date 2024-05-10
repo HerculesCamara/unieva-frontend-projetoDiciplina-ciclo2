@@ -86,6 +86,9 @@ body a {
     text-decoration: none;
     color: rgb(1, 185, 124);
   }
+  footer nav {
+    margin-top: 16px;
+  }
 
   .banner {
     display: flex;
